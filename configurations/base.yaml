@@ -1,0 +1,17 @@
+paths:
+  data_root: data/
+
+dataset:
+  image_size: [224, 224]
+
+training:
+  batch_size: 32
+  epochs: 10
+  learning_rate: 0.001
+  weight_decay: 0.0
+
+misc:
+  seed: 42
+  workers: 4
+
+device: auto
