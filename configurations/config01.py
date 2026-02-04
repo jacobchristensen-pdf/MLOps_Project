@@ -18,19 +18,22 @@ print(config.BATCH_SIZE)
 """
 
 # Paths
-DATA = Path("")
+TRAIN_DIR = r"C:\Users\alext\Downloads\down.micr.com_down_3_E_1_3E1C-ECDB-4869-83t5dL0AqEqZkh827kQD8ImFN3e1ro0VHHaobmSQAzSvk\PetImages\train"
+VAL_DIR   = r"C:\Users\alext\Downloads\down.micr.com_down_3_E_1_3E1C-ECDB-4869-83t5dL0AqEqZkh827kQD8ImFN3e1ro0VHHaobmSQAzSvk\PetImages\val"
+OUT_DIR   = "runs"
 
-# Dataset
-IMAGE_SIZE = () # (H, W)
-
-# Hyperparametre
-BATCH_SIZE = int 
-EPOCHS = int 
-LEARNING_RATE = int
-WEIGHT_DECAY   = 0.0
 
 # Misc
 SEED = 42
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-WORKERS = int
 
+
+
+IMAGE_SIZE = 128
+BATCH_SIZE = 32
+EPOCHS     = 5
+LR         = 1e-4
+NUM_WORKERS = 4
+
+
+WEIGHT_DECAY   = 0.0
