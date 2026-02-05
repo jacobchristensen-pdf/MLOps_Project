@@ -1,6 +1,8 @@
 paths:
-  data_root: data/
-
+  data_root: data/datav1
+  train_data: null #Overridden dynamically in the code
+  val_data: null   #Overridden dynamically in the code
+  test_data: null  #Overridden dynamically in the code
 dataset:
   image_size: [224, 224]
 
