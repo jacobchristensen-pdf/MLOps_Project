@@ -1,5 +1,7 @@
 import yaml
 import torch
+from pathlib import Path
+
 
 def load_config(path):
     """
@@ -13,6 +15,13 @@ def load_config(path):
     """
     with open(path, "r") as f:
         cfg = yaml.safe_load(f)
+
+        # This section is to ensure that if the individual paths are not set, 
+        # they will be derived from the data_root
+        root = Path(cfg["paths"]["data_root"])
+        for split in ["train_data", "val_data", "test_data"]:
+            if cfg["paths"].get(split) is None:
+                cfg["paths"][split] = str(root / split.split("_")[0])
     return cfg
 
 def get_device(cfg):
