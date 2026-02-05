@@ -4,7 +4,7 @@ paths:
   val_data: null   #Overridden dynamically in the code
   test_data: null  #Overridden dynamically in the code
 dataset:
-  image_size: [224, 224]
+  image_size: 224
 
 training:
   batch_size: 32
