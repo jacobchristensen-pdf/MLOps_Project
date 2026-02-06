@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 
 from .model import build_model
 from .data_loader import CatsDogsLoader
-from configurations import config01 as config
+from .utils import load_config, get_device
 
 
 def train_one_epoch(model, data_loader, loss_fn, optimizer, device):
@@ -47,23 +47,24 @@ def validate(model, data_loader, loss_fn, device):
 
 
 def main():
-    device = config.DEVICE
+    config = load_config("configurations/base.yaml")
+    device = get_device(config)
     print("Device:", device)
 
     # Create datasets
-    train_dataset = CatsDogsLoader(config.TRAIN_DIR, config.IMAGE_SIZE)
-    val_dataset   = CatsDogsLoader(config.VAL_DIR, config.IMAGE_SIZE)
+    train_dataset = CatsDogsLoader(config["paths"]["train_data"], config["dataset"]["image_size"])
+    val_dataset   = CatsDogsLoader(config["paths"]["val_data"], config["dataset"]["image_size"])
 
     # DataLoaders for batching and shuffling
     train_loader = DataLoader(
         train_dataset,
-        batch_size=config.BATCH_SIZE,
+        batch_size=config["training"]["batch_size"],
         shuffle=True,
-        num_workers=config.NUM_WORKERS
+        num_workers=config["misc"]["workers"]
     )
     val_loader = DataLoader(
         val_dataset,
-        batch_size=config.BATCH_SIZE,
+        batch_size=config["training"]["batch_size"],
         shuffle=False
     )
 
@@ -72,15 +73,15 @@ def main():
 
     # Loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=config.LR)
+    optimizer = optim.Adam(model.parameters(), lr=config["training"]["learning_rate"])
 
     # Save the best model based on validation loss
     best_val_loss = float("inf")
-    best_model_path = Path(config.OUT_DIR) / "best.pt"
+    best_model_path = Path(config["paths"]["out_dir"]) / "best.pt"
     best_model_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Training loop
-    for epoch in range(1, config.EPOCHS + 1):
+    for epoch in range(1, config["training"]["epochs"] + 1):
         train_loss = train_one_epoch(
             model, train_loader, loss_fn, optimizer, device
         )
@@ -89,7 +90,7 @@ def main():
         )
 
         print(
-            f"Epoch {epoch}/{config.EPOCHS} | "
+            f"Epoch {epoch}/{config['training']['epochs']} | "
             f"train loss={train_loss:.4f} | "
             f"val loss={val_loss:.4f}"
         )
