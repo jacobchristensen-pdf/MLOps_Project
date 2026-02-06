@@ -16,7 +16,7 @@ def parse_args() -> argparse.Namespace:
                    help="Path to image file")
     return p.parse_args()
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
 
     # Load config and device
@@ -51,3 +51,6 @@ if __name__ == "__main__":
 
     print(f"Prediction: {label}")
     print(f"Probabilities: {probs.cpu().tolist()}")
+
+if __name__ == "__main__":
+    main()
