@@ -7,6 +7,7 @@ import model as m
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Cats vs Dogs inference")
+    # Arguments used for inference (To be written in terminal)
     p.add_argument("--config", type=str, default=None, required=True,
                    help="Path to YAML config")
     p.add_argument("--model", type=str, default=None, required=True,
