@@ -1,9 +1,14 @@
 # Finde filer
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageFile
 import torch
 import torchvision.transforms as T
 import random
+import warnings
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True  # Allows loading of corrupted images without crashing
+# Suppress PIL warnings a verify method has been added to handle these types of files
+warnings.filterwarnings("ignore", category=UserWarning, module="PIL")
 
 
 def get_files(directory):
@@ -18,7 +23,13 @@ def get_files(directory):
 
 def load_image(image_path):
     "Opens picture with PIL and converts it to RGB"
-    return Image.open(image_path).convert("RGB")  # Secures RGB 3-channel input
+    try:
+        img = Image.open(image_path)
+        img.verify()  # Verifies that the image is not corrupted
+        return Image.open(image_path).convert("RGB")  # Secures RGB 3-channel input
+    except Exception as e:
+        print(f"CORRUPTED: {image_path} - {e}")
+        return None
 
 
 def totensor(image_size: int):
@@ -32,10 +43,26 @@ def totensor(image_size: int):
 class CatsDogsLoader:
     def __init__(self, root_dir, image_size):
         root_dir = Path(root_dir)
+        self.image_size = image_size
 
         # Loads file paths for each class
-        self.cat_image_paths = get_files(root_dir / "Cat")
-        self.dog_image_paths = get_files(root_dir / "Dog")
+        cat_paths = get_files(root_dir / "Cat")
+        dog_paths = get_files(root_dir / "Dog")
+
+        print(f"\nScanning for corrupted images")
+
+        # Filter out corrupted images
+        self.cat_image_paths = [p for p in cat_paths if load_image(p) is not None]
+        self.dog_image_paths = [p for p in dog_paths if load_image(p) is not None]
+
+        # Log how many images were skipped
+        skipped_cats = len(cat_paths) - len(self.cat_image_paths)
+        skipped_dogs = len(dog_paths) - len(self.dog_image_paths)
+        print(f"\n finished scanning:")
+        print(f"   Valid cats: {len(self.cat_image_paths)}")
+        print(f"   Valid dogs: {len(self.dog_image_paths)}")
+        print(f"   Skipped cats: {skipped_cats}")
+        print(f"   Skipped dogs: {skipped_dogs}\n")
 
         # Transform applied to all images
         self.transform = totensor(image_size)
@@ -54,6 +81,9 @@ class CatsDogsLoader:
         )
 
         image = load_image(image_path)
+        if image is None:
+            return None # Skip corrupted images
+        
         image_tensor = self.transform(image)
         label_tensor = torch.tensor(class_label, dtype=torch.long)
 
