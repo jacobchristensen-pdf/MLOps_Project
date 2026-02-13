@@ -53,7 +53,7 @@ def main():
 
     # Create datasets
     train_dataset = CatsDogsLoader(config["paths"]["train_data"], config["dataset"]["image_size"])
-    val_dataset   = CatsDogsLoader(config["paths"]["val_data"], config["dataset"]["image_size"])
+    val_dataset = CatsDogsLoader(config["paths"]["val_data"], config["dataset"]["image_size"])
 
     # DataLoaders for batching and shuffling
     train_loader = DataLoader(

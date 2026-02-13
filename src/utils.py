@@ -24,6 +24,7 @@ def load_config(path):
                 cfg["paths"][split] = str(root / split.split("_")[0])
     return cfg
 
+
 def get_device(cfg):
     """
     Determine the computation device based on configuration.

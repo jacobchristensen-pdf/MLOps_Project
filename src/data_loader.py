@@ -49,7 +49,7 @@ class CatsDogsLoader:
         cat_paths = get_files(root_dir / "Cat")
         dog_paths = get_files(root_dir / "Dog")
 
-        print(f"\nScanning for corrupted images")
+        print("\nScanning for corrupted images")
 
         # Filter out corrupted images
         self.cat_image_paths = [p for p in cat_paths if load_image(p) is not None]
@@ -58,7 +58,7 @@ class CatsDogsLoader:
         # Log how many images were skipped
         skipped_cats = len(cat_paths) - len(self.cat_image_paths)
         skipped_dogs = len(dog_paths) - len(self.dog_image_paths)
-        print(f"\n finished scanning:")
+        print("\n finished scanning:")
         print(f"   Valid cats: {len(self.cat_image_paths)}")
         print(f"   Valid dogs: {len(self.dog_image_paths)}")
         print(f"   Skipped cats: {skipped_cats}")
@@ -82,7 +82,7 @@ class CatsDogsLoader:
 
         image = load_image(image_path)
         if image is None:
-            return None # Skip corrupted images
+            return None  # Skip corrupted images
 
         image_tensor = self.transform(image)
         label_tensor = torch.tensor(class_label, dtype=torch.long)

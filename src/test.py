@@ -1,4 +1,3 @@
-import torch.nn as nn
 from torch.utils.data import DataLoader
 from data_loader import CatsDogsLoader
 import torch
@@ -9,13 +8,12 @@ import model as m
 
 
 if __name__ == "__main__":
-    #Load config
+    # Load config
     config = utils.load_config("configurations/base.yaml")
     device = utils.get_device(config)
 
     # Test config
     print(f"Testing config -> Device = {config['device']}")
-
 
     # Load trained model
     model = m.build_model()
@@ -25,14 +23,12 @@ if __name__ == "__main__":
 
     test_ds = CatsDogsLoader(config["paths"]["test_data"], config["dataset"]["image_size"])
 
-
     test_loader = DataLoader(
         test_ds,
         batch_size=config["training"]["batch_size"],
         shuffle=False,
         num_workers=config["misc"]["workers"]
     )
-
 
     # Initialize counters
     total = 0

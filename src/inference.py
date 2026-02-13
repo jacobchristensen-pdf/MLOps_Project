@@ -5,6 +5,7 @@ import argparse
 import utils
 import model as m
 
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Cats vs Dogs inference")
     # Arguments used for inference (To be written in terminal)
@@ -15,6 +16,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--input", type=str, default=None, required=True,
                    help="Path to image file")
     return p.parse_args()
+
 
 def main():
     args = parse_args()
@@ -51,6 +53,7 @@ def main():
 
     print(f"Prediction: {label}")
     print(f"Probabilities: {probs.cpu().tolist()}")
+
 
 if __name__ == "__main__":
     main()
