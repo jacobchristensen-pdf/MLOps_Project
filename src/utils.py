@@ -11,12 +11,12 @@ def load_config(path):
 
     Use case example:
         batch_size = cfg["training"]["batch_size"]
-    
+
     """
     with open(path, "r") as f:
         cfg = yaml.safe_load(f)
 
-        # This section is to ensure that if the individual paths are not set, 
+        # This section is to ensure that if the individual paths are not set,
         # they will be derived from the data_root
         root = Path(cfg["paths"]["data_root"])
         for split in ["train_data", "val_data", "test_data"]:
@@ -33,4 +33,3 @@ def get_device(cfg):
     if cfg["device"] == "auto":
         return torch.device("cuda" if torch.cuda.is_available() else "cpu")
     return torch.device(cfg["device"])
-

@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="PIL")
 def get_files(directory):
     "Makes a sorted list with all file paths"
     directory = Path(directory)             # converts to Path object for easy file handling
-    return sorted([                         
+    return sorted([
         file_path
         for file_path in directory.iterdir()    # Iterates through all items in the directory
         if file_path.is_file()                  # Only include files, ignore subdirectories
@@ -83,7 +83,7 @@ class CatsDogsLoader:
         image = load_image(image_path)
         if image is None:
             return None # Skip corrupted images
-        
+
         image_tensor = self.transform(image)
         label_tensor = torch.tensor(class_label, dtype=torch.long)
 

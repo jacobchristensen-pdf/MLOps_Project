@@ -1,0 +1,22 @@
+# Kører kun på staged filer som standard (det er pre-commits default)
+# Denne config beskriver hvilke "hooks" der skal køres før et commit accepteres.
+
+repos:
+  # 1) Standard kvalitetstjek: whitespace, yaml/json, merge conflicts, store filer, private keys
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace          # Fjerner/fejler på trailing spaces
+      - id: end-of-file-fixer            # Sikrer newline i slutningen af filer
+      - id: check-yaml                   # Validerer YAML (f.eks. configs)
+      - id: check-json                   # Validerer JSON
+      - id: check-merge-conflict         # Stopper commits med <<<<<<< ======= >>>>>>>
+      - id: detect-private-key           # Finder typiske private keys
+      - id: check-added-large-files      # Stopper store filer i Git
+        args: ["--maxkb=5000"]           # 5 MB (tilpas hvis I vil)
+
+  # 2) Python lint (PEP8-ish) for typiske fejl
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.0
+    hooks:
+      - id: flake8
