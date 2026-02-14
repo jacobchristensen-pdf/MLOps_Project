@@ -1,0 +1,36 @@
+# den her code kører AUtomatisk/ hvis nogelt fejler commit bliver stoppet.(git commit -m "..." for at kører den her code)
+
+repos:
+  # Basis kvalitetstjek (vigtigt for alle projekter)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace           # Fjern mellemrum i slutningen af linjer
+      - id: end-of-file-fixer             # Sikr newline i slutningen af filer
+      - id: check-yaml                    # Tjek YAML filer (DVC, Docker, CI/CD)
+      - id: check-json                    # Tjek JSON filer
+      - id: check-added-large-files       # Stop store filer (>5MB)
+        args: ['--maxkb=5000']
+      - id: check-merge-conflict          # Stop merge conflict markers
+      - id: detect-private-key            # Find SSH keys og secrets
+
+  # Python kode kvalitet
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        args: ['--max-line-length=100']   # Tillad lidt længere linjer
+
+  # Python formatering (automatisk fix)
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
+        language_version: python3.12      # Tilpas til din Python version
+
+  # Sorter imports automatisk
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--profile', 'black']      # Kompatibel med black
