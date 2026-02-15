@@ -1,4 +1,10 @@
-import os, sys
+import os
+import sys
+
+# MUST be set before importing pydeequ
+os.environ["SPARK_VERSION"] = "3.3"
+
+# Ensure driver + workers use the same python (your conda env)
 os.environ["PYSPARK_PYTHON"] = sys.executable
 os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
 
@@ -13,10 +19,7 @@ def test_dataset():
         SparkSession.builder
         .master("local[*]")
         .appName("data-test")
-        .config(
-            "spark.jars.packages",
-            pydeequ.deequ_maven_coord
-        )
+        .config("spark.jars.packages", pydeequ.DEEQU_MAVEN_COORD)  # pydeequ 1.1.0 uses DEEQU_MAVEN_COORD
         .getOrCreate()
     )
 
