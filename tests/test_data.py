@@ -16,9 +16,9 @@ def test_dataset():
             "spark.jars.packages",
             f"{pydeequ.deequ_maven_coord},{pydeequ.f2j_maven_coord}"
         )
-        .config("spark.jars.excludes", pydeequ.f2j_exclusions)
         .getOrCreate()
     )
+
 
     data = [
         ("img1.jpg", "cat", 224, 224),
