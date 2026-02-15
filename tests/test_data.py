@@ -14,13 +14,10 @@ def test_dataset():
         .appName("data-test")
         .config(
             "spark.jars.packages",
-            f"{pydeequ.deequ_maven_coord},{pydeequ.f2j_maven_coord}"
+            pydeequ.deequ_maven_coord
         )
-        .config("spark.jars.excludes", "net.sourceforge.f2j:arpack_combined_all")
         .getOrCreate()
     )
-
-
 
     data = [
         ("img1.jpg", "cat", 224, 224),
