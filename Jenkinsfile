@@ -11,19 +11,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("mlops_project:${env.BUILD_NUMBER}")
-                }
+                sh 'docker build -t mlops_project:${BUILD_NUMBER} .'
             }
         }
 
         stage('Run Tests') {
             steps {
-                script {
-                    docker.image("mlops_project:${env.BUILD_NUMBER}").inside {
-                        sh 'pytest'
-                    }
-                }
+                sh 'docker run --rm mlops_project:${BUILD_NUMBER} pytest'
             }
         }
     }
