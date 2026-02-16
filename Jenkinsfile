@@ -7,5 +7,10 @@ pipeline {
                 sh 'echo "Hello MLOps"'
             }
         }
+        stage('Test') {
+            steps {
+                sh 'echo "Test enabled"' 
+    }
+}
     }
 }
