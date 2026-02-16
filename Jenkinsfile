@@ -2,15 +2,35 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+
+        stage('Checkout') {
             steps {
-                sh 'echo "Hello MLOps"'
+                checkout scm
             }
         }
-        stage('Test') {
+
+        stage('Build Docker Image') {
             steps {
-                sh 'echo "Test enabled"' 
+                script {
+                    docker.build("mlops_project:${env.BUILD_NUMBER}")
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    docker.image("mlops_project:${env.BUILD_NUMBER}").inside {
+                        sh 'pytest'
+                    }
+                }
+            }
+        }
     }
-}
+
+    post {
+        always {
+            cleanWs()
+        }
     }
 }
