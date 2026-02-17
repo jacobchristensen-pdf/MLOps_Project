@@ -32,12 +32,12 @@ pipeline {
         }
         stage('Train new model') {
             steps {
-                sh 'docker run --rm mlops_project:${BUILD_NUMBER} python src/train.py'
+                sh 'docker run --rm mlops_project:${BUILD_NUMBER} python -m src.train'
             }
         }
         stage('Evaluate new model') {
             steps {
-                sh 'docker run --rm mlops_project:${BUILD_NUMBER} python src/test.py'
+                sh 'docker run --rm mlops_project:${BUILD_NUMBER} python -m src.test'
             }
         }
     }
