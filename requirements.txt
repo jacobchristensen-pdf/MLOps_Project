@@ -1,0 +1,8 @@
+pytest==9.0.2
+flake8
+PyYAML
+pillow
+numpy
+torch==2.5.1
+torchvision==0.20.1
+mlflow

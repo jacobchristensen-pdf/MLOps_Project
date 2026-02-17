@@ -1,0 +1,21 @@
+paths:
+  data_root: data/datav1
+  train_data: null #Overridden dynamically in the code
+  val_data: null   #Overridden dynamically in the code
+  test_data: null  #Overridden dynamically in the code
+  out_dir: runs
+
+dataset:
+  image_size: 128
+
+training:
+  batch_size: 32
+  epochs: 5
+  learning_rate: 0.0001
+  weight_decay: 0.0
+
+misc:
+  seed: 42
+  workers: 4
+
+device: auto
