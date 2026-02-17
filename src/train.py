@@ -60,13 +60,13 @@ def main():
     device = get_device(config)
     print("Device:", device)
 
-    # ========== MLflow: Kun 3 linjer! ==========
+    # MLflow setup
     mlflow.set_tracking_uri("http://172.24.198.42:5000")
     mlflow.set_experiment("CatsDogs")
 
     with mlflow.start_run():
 
-        # ========== Log vigtigste parameters ==========
+        # Log parameters
         mlflow.log_param("learning_rate", config["training"]["learning_rate"])
         mlflow.log_param("epochs", config["training"]["epochs"])
         mlflow.log_param("batch_size", config["training"]["batch_size"])
@@ -87,7 +87,9 @@ def main():
             num_workers=config["misc"]["workers"],
         )
         val_loader = DataLoader(
-            val_dataset, batch_size=config["training"]["batch_size"], shuffle=False
+            val_dataset,
+            batch_size=config["training"]["batch_size"],
+            shuffle=False,
         )
 
         # Initialize model
@@ -112,7 +114,7 @@ def main():
             )
             val_loss, val_accuracy = validate(model, val_loader, loss_fn, device)
 
-            # ========== Log metrics ==========
+            # Log metrics
             mlflow.log_metric("val_loss", val_loss, step=epoch)
             mlflow.log_metric("val_accuracy", val_accuracy, step=epoch)
 
@@ -130,7 +132,7 @@ def main():
                 torch.save(model.state_dict(), best_model_path)
                 print(f"  -> Saved new best model (val_loss={val_loss:.4f})")
 
-        # ========== Gem model i MLflow ==========
+        # Log final metrics and model
         mlflow.log_metric("best_val_accuracy", best_val_accuracy)
         mlflow.pytorch.log_model(model, "model")
 
