@@ -1,0 +1,22 @@
+name: catsdogs_with_test
+
+channels:
+  - conda-forge
+  - pytorch
+  - defaults
+
+dependencies:
+  - python=3.10
+  - pip
+  - openjdk=17
+
+  - pytorch
+  - torchvision
+  - pillow
+  - pyyaml
+
+  - pytest
+
+  - pip:
+      - pyspark==3.3.0
+      - pydeequ==1.1.0
