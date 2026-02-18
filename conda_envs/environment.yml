@@ -10,16 +10,13 @@ dependencies:
   - pip
   - openjdk=17
 
-  # ML deps you already use
   - pytorch
   - torchvision
   - pillow
   - pyyaml
 
-  # test runner
   - pytest
 
-  # PyDeequ + Spark (pin to compatible versions)
   - pip:
       - pyspark==3.3.0
       - pydeequ==1.1.0
