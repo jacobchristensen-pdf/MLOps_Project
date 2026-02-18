@@ -1,49 +1,57 @@
 from pathlib import Path
 
+import mlflow
+import mlflow.pytorch
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from .model import build_model
 from .data_loader import CatsDogsLoader
-from .utils import load_config, get_device
+from .model import build_model
+from .utils import get_device, load_config
 
 
 def train_one_epoch(model, data_loader, loss_fn, optimizer, device):
-    model.train()                              # Places the model in training mode
-    total_loss = 0.0
-
-    for image_tensors, label_tensors in data_loader:
-        image_tensors = image_tensors.to(device)  # Moves inputs to CPU/GPU
-        label_tensors = label_tensors.to(device)  # Moves labels to CPU/GPU
-
-        optimizer.zero_grad()                  # Resets the gradients
-        logits = model(image_tensors)          # Forward pass
-        loss = loss_fn(logits, label_tensors)  # Computes the loss
-        loss.backward()                        # Backpropagation
-        optimizer.step()                       # Updates the model parameters
-
-        total_loss += loss.item()              # Accumulates loss
-
-    return total_loss / len(data_loader)       # Average loss over the epoch
-
-
-@torch.no_grad()
-def validate(model, data_loader, loss_fn, device):
-    model.eval()                               # Evaluation mode (disables dropout, etc.)
+    model.train()
     total_loss = 0.0
 
     for image_tensors, label_tensors in data_loader:
         image_tensors = image_tensors.to(device)
         label_tensors = label_tensors.to(device)
 
-        logits = model(image_tensors)          # Forward pass
-        loss = loss_fn(logits, label_tensors)  # Validation loss
+        optimizer.zero_grad()
+        logits = model(image_tensors)
+        loss = loss_fn(logits, label_tensors)
+        loss.backward()
+        optimizer.step()
 
         total_loss += loss.item()
 
-    return total_loss / len(data_loader)       # Average validation loss
+    return total_loss / len(data_loader)
+
+
+@torch.no_grad()
+def validate(model, data_loader, loss_fn, device):
+    model.eval()
+    total_loss = 0.0
+    correct = 0
+    total = 0
+
+    for image_tensors, label_tensors in data_loader:
+        image_tensors = image_tensors.to(device)
+        label_tensors = label_tensors.to(device)
+
+        logits = model(image_tensors)
+        loss = loss_fn(logits, label_tensors)
+        total_loss += loss.item()
+
+        _, predicted = torch.max(logits, 1)
+        total += label_tensors.size(0)
+        correct += (predicted == label_tensors).sum().item()
+
+    accuracy = correct / total
+    return total_loss / len(data_loader), accuracy
 
 
 def main():
@@ -51,55 +59,73 @@ def main():
     device = get_device(config)
     print("Device:", device)
 
-    # Create datasets
-    train_dataset = CatsDogsLoader(config["paths"]["train_data"], config["dataset"]["image_size"])
-    val_dataset   = CatsDogsLoader(config["paths"]["val_data"], config["dataset"]["image_size"])
+    # Log parameters
+    mlflow.log_param("learning_rate", config["training"]["learning_rate"])
+    mlflow.log_param("epochs", config["training"]["epochs"])
+    mlflow.log_param("batch_size", config["training"]["batch_size"])
 
-    # DataLoaders for batching and shuffling
+    # Create datasets
+    train_dataset = CatsDogsLoader(
+        config["paths"]["train_data"], config["dataset"]["image_size"]
+    )
+    val_dataset = CatsDogsLoader(
+        config["paths"]["val_data"], config["dataset"]["image_size"]
+    )
+
+    # DataLoaders
     train_loader = DataLoader(
         train_dataset,
         batch_size=config["training"]["batch_size"],
         shuffle=True,
-        num_workers=config["misc"]["workers"]
+        num_workers=config["misc"]["workers"],
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=config["training"]["batch_size"],
-        shuffle=False
+        shuffle=False,
     )
 
     # Initialize model
     model = build_model(num_classes=2).to(device)
 
-    # Loss function and optimizer
+    # Loss and optimizer
     loss_fn = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=config["training"]["learning_rate"])
 
-    # Save the best model based on validation loss
+    # Best model tracking
     best_val_loss = float("inf")
+    best_val_accuracy = 0.0
     best_model_path = Path(config["paths"]["out_dir"]) / "best.pt"
     best_model_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Training loop
     for epoch in range(1, config["training"]["epochs"] + 1):
-        train_loss = train_one_epoch(
-            model, train_loader, loss_fn, optimizer, device
-        )
-        val_loss = validate(
-            model, val_loader, loss_fn, device
-        )
+        train_loss = train_one_epoch(model, train_loader, loss_fn, optimizer, device)
+        val_loss, val_accuracy = validate(model, val_loader, loss_fn, device)
+
+        mlflow.log_metric("train_loss", train_loss, step=epoch)
+        mlflow.log_metric("val_loss", val_loss, step=epoch)
+        mlflow.log_metric("val_accuracy", val_accuracy, step=epoch)
 
         print(
             f"Epoch {epoch}/{config['training']['epochs']} | "
             f"train loss={train_loss:.4f} | "
-            f"val loss={val_loss:.4f}"
+            f"val loss={val_loss:.4f} | "
+            f"val acc={val_accuracy:.4f}"
         )
 
-        # Save model if validation improves
         if val_loss < best_val_loss:
             best_val_loss = val_loss
+            best_val_accuracy = val_accuracy
             torch.save(model.state_dict(), best_model_path)
             print(f"  -> Saved new best model (val_loss={val_loss:.4f})")
+
+    mlflow.log_metric("best_val_accuracy", best_val_accuracy)
+    mlflow.log_metric("best_val_loss", best_val_loss)
+    mlflow.log_artifact(str(best_model_path))
+
+    # ← VIGTIG ÆNDRING: returner resultater til pipeline
+    return model, best_val_accuracy, best_val_loss, config
 
 
 if __name__ == "__main__":

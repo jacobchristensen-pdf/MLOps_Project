@@ -1,5 +1,21 @@
 data/*
 models/*
-
 !data/.gitkeep
 !models/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Model filer (håndteres af DVC)
+runs/
+*.pt
+*.pth
+
+# IDE
+.vscode/
+.DS_Store
+
+# MLflow
+mlruns/
