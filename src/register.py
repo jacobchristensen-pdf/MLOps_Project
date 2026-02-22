@@ -5,7 +5,7 @@ import mlflow.pytorch
 def register_model(model, passed_evaluation):
     """Add model to MLflow registry if evaluation passed"""
     if passed_evaluation:
-        print("\n📝 Registering model in MLflow...")
+        print("\n Registering model in MLflow...")
 
         mlflow.pytorch.log_model(
             model,
@@ -13,7 +13,7 @@ def register_model(model, passed_evaluation):
             registered_model_name="CatsDogsClassifier",
         )
         mlflow.set_tag("deployment_status", "registered")
-        print("✅ Model registered as CatsDogsClassifier!")
+        print(" Model registered as CatsDogsClassifier!")
     else:
         mlflow.set_tag("deployment_status", "rejected")
-        print("❌ Model not registered - did not meet criteria!")
+        print(" Model not registered - did not meet criteria!")
