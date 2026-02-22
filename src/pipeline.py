@@ -1,4 +1,4 @@
-﻿import mlflow
+import mlflow
 
 from .deploy import deploy
 from .evaluate import evaluate
@@ -9,7 +9,7 @@ from .train import main as train_model
 
 def run_pipeline():
     """Run the full MLOps pipeline"""
-    print("🚀 Starting MLOps Pipeline...")
+    print("Starting MLOps Pipeline...")
 
     mlflow.set_tracking_uri("http://172.24.198.42:5000")
     mlflow.set_experiment("CatsDogs")
@@ -17,26 +17,26 @@ def run_pipeline():
     with mlflow.start_run(run_name="Full_MLOps_Pipeline"):
 
         # Step 1: Train
-        print("\n1️⃣ TRAINING...")
+        print("\n[1/5] TRAINING...")
         model, accuracy, loss, config = train_model()
 
         # Step 2: Evaluate
-        print("\n2️⃣ EVALUATING...")
+        print("\n[2/5] EVALUATING...")
         passed = evaluate(accuracy, loss)
 
         # Step 3: Register
-        print("\n3️⃣ REGISTERING...")
+        print("\n[3/5] REGISTERING...")
         register_model(model, passed)
 
         # Step 4: Deploy
-        print("\n4️⃣ DEPLOYING...")
+        print("\n[4/5] DEPLOYING...")
         deploy(passed)
 
         # Step 5: Model Card
-        print("\n5️⃣ MODEL CARD...")
+        print("\n[5/5] MODEL CARD...")
         create_model_card(accuracy, loss, config)
 
-        print("\n✅ Pipeline completed!")
+        print("\nPipeline completed successfully!")
 
 
 if __name__ == "__main__":
